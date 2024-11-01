@@ -10,5 +10,5 @@ def test_subtraction():
 
 def test_multiplication():
     '''Multiplication Function'''
-    assert multiplication (1,1) == 1
+    assert multiplication (1,2) == 2
     
