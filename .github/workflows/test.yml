@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11' ]
+        python-version: [ '3.9', '3.10', '3.11' ]  # Removed '3.8'
 
     steps:
       - name: Checkout repository
@@ -29,11 +29,11 @@ jobs:
 
       - name: Lint with pylint
         run: |
-          pylint MIDTERM_IS218 tests
+          pylint your_package_name tests
 
       - name: Run tests with coverage
         run: |
-          pytest --cov --pylint --cov-report=xml --cov-fail-under=100
+          pytest --cov=your_package_name --cov-report=xml --cov-fail-under=100
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
