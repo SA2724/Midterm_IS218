@@ -31,7 +31,7 @@ def test_write_file_positive(fake_fs: Any, caplog: pytest.LogCaptureFixture):
     with open("test_file.txt", 'r', encoding='utf-8') as file:
         content = file.read()
         assert content == "Hello, World!"
-    
+
     # Check logging without quotes around the filename
     assert "Successfully wrote to file: test_file.txt" in caplog.text
 
