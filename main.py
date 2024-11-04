@@ -1,14 +1,18 @@
-from app.calculation import Addition, Subtraction, Multiplication, Division
-from app.calculator import Calculator
+# app/command_processor.py
+
 from typing import Dict, Type
-from app.history_manager import HistoryManager
+from app.calculation import Addition, Subtraction, Multiplication, Division, Power, Modulus
+from app.calculator import Calculator
+from app.history_manager import HistoryManager, OperationCommand
 
 # Dictionary mapping operation strings to the corresponding calculation class.
 operations_map: Dict[str, Type] = {
     'add': Addition,
     'subtract': Subtraction,
     'multiply': Multiplication,
-    'divide': Division
+    'divide': Division,
+    'power': Power,
+    'mod': Modulus
 }
 
 class CommandProcessor:
@@ -16,18 +20,20 @@ class CommandProcessor:
     Processes user commands, performs calculations, and interacts with the Calculator and HistoryManager.
 
     Attributes:
-    calculator (Calculator): The calculator to perform operations.
+        calculator (Calculator): The calculator to perform operations.
+        history_manager (HistoryManager): Manages the history of operations.
     """
     def __init__(self) -> None:
-        """Initializes the CommandProcessor with a Calculator instance."""
+        """Initializes the CommandProcessor with a Calculator and HistoryManager instance."""
         self.calculator = Calculator()
+        self.history_manager = HistoryManager()
 
     def execute(self, command: str) -> None:
         """
-        Executes a given command, processes the operation, and displays the result.
+        Executes a given command, processes the operation, records it in history, and displays the result.
 
         Args:
-        command (str): The user's input command.
+            command (str): The user's input command.
         """
         # Split the command into operation and arguments
         parts = command.split()
@@ -61,6 +67,15 @@ class CommandProcessor:
             result = self.calculator.perform_operation(calculation)
             print(f"Result: {result}")
             print(f"Operation: {calculation}")  # This uses the __str__ of the calculation class
+
+            # Record the operation in history
+            operation_command = OperationCommand(
+                operation=operation,
+                a=a,
+                b=b,
+                result=result
+            )
+            self.history_manager.add_to_history(operation_command)
         except ZeroDivisionError:
             print("Error: Division by zero.")
 
@@ -72,6 +87,8 @@ Available commands:
   subtract a b   - Subtracts b from a
   multiply a b   - Multiplies a and b
   divide a b     - Divides a by b
+  power a b      - Raises the power of a by b 
+  mod a b        - Modulus a by b 
   history        - Shows the operation history
   undo           - Undoes the last operation
   clear          - Clears the operation history
@@ -81,24 +98,28 @@ Available commands:
 
     def show_history(self) -> None:
         """Displays the full history of operations performed."""
-        history = self.calculator.get_history()
+        history = self.history_manager.get_full_history()
         if not history:
             print("No operations in history.")
         else:
             for index, command in enumerate(history, start=1):
-                print(f"{index}: {command.operation}")
+                print(f"{index}: {command.operation} {command.a} {command.b} = {command.result}")
 
     def undo_last(self) -> None:
         """Undoes the last operation and displays the undone operation."""
-        last_operation = self.calculator.undo()
+        last_operation = self.history_manager.undo_last()
         if last_operation:
-            print(f"Undid operation: {last_operation.operation}")
+            # Implement the logic to undo the last operation using Calculator
+            # This depends on how Calculator is designed to handle undo operations
+            # For demonstration, we'll assume Calculator has an `undo_operation` method
+            self.calculator.undo_operation(last_operation)
+            print(f"Undid operation: {last_operation.operation} {last_operation.a} {last_operation.b} = {last_operation.result}")
         else:
             print("No operation to undo.")
 
     def clear_history(self) -> None:
         """Clears the operation history."""
-        self.calculator.clear_history()
+        self.history_manager.clear_history()
         print("History cleared.")
 
 def main():
@@ -106,7 +127,11 @@ def main():
     print("Welcome to the Calculator REPL. Type 'help' for instructions or 'exit' to quit.")
 
     while True:
-        command = input(">>> ").strip().lower()
+        try:
+            command = input(">>> ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            print("\nGoodbye!")
+            break
 
         if command in ['exit', 'quit']:
             print("Goodbye!")
