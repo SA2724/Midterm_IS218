@@ -1,6 +1,6 @@
 '''My Calculator Test with Fixtures and Parameterization'''
 import pytest
-from app.main import addition, division, multiplication, subtraction
+from main import addition, division, multiplication, subtraction
 
 @pytest.fixture
 def add_data():
