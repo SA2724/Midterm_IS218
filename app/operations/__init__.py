@@ -7,7 +7,11 @@ Number = Union[int, float]
 # addition function 
 def addition(a: Number, b: Number) -> Number:
    
-    return a - b  # Return the result of a minus b
+    return a +  b  # Return the result of a plus b
+
+def subtraction(a: Number, b: Number) -> Number:
+
+    return a - b #return result of a minus b 
 
 def multiplication(a: Number, b: Number) -> Number:
     
