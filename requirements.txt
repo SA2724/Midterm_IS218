@@ -17,3 +17,4 @@ pytest-pylint==0.21.0
 tomli==2.0.2
 tomlkit==0.13.2
 typing_extensions==4.12.2
+pexpect 
