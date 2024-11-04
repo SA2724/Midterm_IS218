@@ -1,110 +1,134 @@
-'''My Calculator Test with Fixtures and Parameterization'''
+'# test_main.py
+
 import pytest
-from main import addition, division, multiplication, subtraction
+import pexpect
+import sys
+
+
+
+def test_repl_addition(repl: pexpect.spawn):
+    """Test addition operation in the REPL."""
+    repl.sendline('add 10 5')
+    repl.expect('Result: 15\.0')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
+
+def test_repl_help(repl: pexpect.spawn):
+    """Test the help command in the REPL."""
+    repl.sendline('help')
+    repl.expect('Available commands:')
+    repl.expect('add a b.*Adds a and b')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
+
+def test_repl_invalid_command(repl: pexpect.spawn):
+    """Test handling of an unknown command."""
+    repl.sendline('unknown 1 2')
+    repl.expect("Unknown operation 'unknown'.*")
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
+
+def test_repl_division_by_zero(repl: pexpect.spawn):
+    """Test division by zero handling."""
+    repl.sendline('divide 10 0')
+    repl.expect('Error: Division by zero\.')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
+
+def test_repl_invalid_numbers(repl: pexpect.spawn):
+    """Test handling of invalid numeric input."""
+    repl.sendline('add ten five')
+    repl.expect('Invalid numbers\. Please enter valid numeric values\.')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
+
+def test_repl_multiple_operations(repl: pexpect.spawn):
+    """Test multiple operations in a single REPL session."""
+    repl.sendline('add 1 2')
+    repl.expect('Result: 3\.0')
+    repl.sendline('subtract 5 3')
+    repl.expect('Result: 2\.0')
+    repl.sendline('multiply 4 2')
+    repl.expect('Result: 8\.0')
+    repl.sendline('divide 9 3')
+    repl.expect('Result: 3\.0')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
+# test_main.py
+
+import pytest
+import pexpect
+import sys
 
 @pytest.fixture
-def add_data():
-    """Fixture for addition test data"""
-    return [
-        (1, 1, 2),
-        (2, 3, 5),
-        (-1, -1, -2),
-        (-1, 1, 0),
-        (0, 0, 0)
-    ]
+def repl():
+    """Fixture to start the REPL application."""
+    # Path to the main.py script
+    script = 'main.py'
 
-@pytest.fixture
-def subtract_data():
-    """Fixture for subtraction test data"""
-    return [
-        (1, 1, 0),
-        (5, 3, 2),
-        (-1, -1, 0),
-        (-1, 1, -2),
-        (0, 0, 0)
-    ]
+    # Start the REPL application
+    child = pexpect.spawn(sys.executable + f' {script}', encoding='utf-8', timeout=5)
+    child.expect('Welcome to the Calculator REPL.*')
+    yield child
+    child.terminate()
 
-@pytest.fixture
-def multiply_data():
-    """Fixture for multiplication test data"""
-    return [
-        (1, 2, 2),
-        (3, 4, 12),
-        (-1, -2, 2),
-        (-1, 2, -2),
-        (0, 5, 0)
-    ]
+def test_repl_addition(repl: pexpect.spawn):
+    """Test addition operation in the REPL."""
+    repl.sendline('add 10 5')
+    repl.expect('Result: 15\.0')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
 
-@pytest.fixture
-def divide_data():
-    """Fixture for division test data"""
-    return [
-        (4, 2, 2),
-        (10, 5, 2),
-        (-4, -2, 2),
-        (-4, 2, -2),
-        (0, 1, 0)
-    ]
+def test_repl_help(repl: pexpect.spawn):
+    """Test the help command in the REPL."""
+    repl.sendline('help')
+    repl.expect('Available commands:')
+    repl.expect('add a b.*Adds a and b')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
 
-@pytest.fixture
-def divide_zero_data():
-    """Fixture for division by zero test cases"""
-    return [
-        (10, 0),
-        (-5, 0),
-        (0, 0)
-    ]
+def test_repl_invalid_command(repl: pexpect.spawn):
+    """Test handling of an unknown command."""
+    repl.sendline('unknown 1 2')
+    repl.expect("Unknown operation 'unknown'.*")
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
 
-@pytest.mark.parametrize("a, b, expected", [
-    (1, 1, 2),
-    (2, 3, 5),
-    (-1, -1, -2),
-    (-1, 1, 0),
-    (0, 0, 0)
-])
-def test_addition(a, b, expected):
-    """Addition Function"""
-    assert addition(a, b) == expected
+def test_repl_division_by_zero(repl: pexpect.spawn):
+    """Test division by zero handling."""
+    repl.sendline('divide 10 0')
+    repl.expect('Error: Division by zero\.')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
 
-@pytest.mark.parametrize("a, b, expected", [
-    (1, 1, 0),
-    (5, 3, 2),
-    (-1, -1, 0),
-    (-1, 1, -2),
-    (0, 0, 0)
-])
-def test_subtraction(a, b, expected):
-    """Subtraction Function"""
-    assert subtraction(a, b) == expected
+def test_repl_invalid_numbers(repl: pexpect.spawn):
+    """Test handling of invalid numeric input."""
+    repl.sendline('add ten five')
+    repl.expect('Invalid numbers\. Please enter valid numeric values\.')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
 
-@pytest.mark.parametrize("a, b, expected", [
-    (1, 2, 2),
-    (3, 4, 12),
-    (-1, -2, 2),
-    (-1, 2, -2),
-    (0, 5, 0)
-])
-def test_multiplication(a, b, expected):
-    """Multiplication Function"""
-    assert multiplication(a, b) == expected
-
-@pytest.mark.parametrize("a, b, expected", [
-    (4, 2, 2),
-    (10, 5, 2),
-    (-4, -2, 2),
-    (-4, 2, -2),
-    (0, 1, 0)
-])
-def test_division(a, b, expected):
-    """Division Function"""
-    assert division(a, b) == expected
-
-@pytest.mark.parametrize("a, b", [
-    (10, 0),
-    (-5, 0),
-    (0, 0)
-])
-def test_division_by_zero(a, b):
-    """Division by Zero Function"""
-    with pytest.raises(ZeroDivisionError):
-        division(a, b)
+def test_repl_multiple_operations(repl: pexpect.spawn):
+    """Test multiple operations in a single REPL session."""
+    repl.sendline('add 1 2')
+    repl.expect('Result: 3\.0')
+    repl.sendline('subtract 5 3')
+    repl.expect('Result: 2\.0')
+    repl.sendline('multiply 4 2')
+    repl.expect('Result: 8\.0')
+    repl.sendline('divide 9 3')
+    repl.expect('Result: 3\.0')
+    repl.sendline('exit')
+    repl.expect('Goodbye!')
+    repl.expect(pexpect.EOF)
