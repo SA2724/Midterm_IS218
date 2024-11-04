@@ -20,3 +20,9 @@ def multiplication(a: Number, b: Number) -> Number:
 def division(a: Number, b: Number) -> Number:
 
     return a / b  # Return the result of a divided by b
+
+def power(a: Number, b: Number) -> Number:
+    return a ** b # return the power of a by b 
+
+def modulus(a: Number, b: Number) -> Number:
+    return a % b  # return float value of a modulus b 
