@@ -1,5 +1,8 @@
-import pytest
+"""Test module for Calculator operations and history management."""
+
 from unittest.mock import Mock
+
+
 from app.calculation import Calculation
 from app.calculator import Calculator
 from app.history_manager import OperationCommand
@@ -12,7 +15,7 @@ def test_perform_operation():
     # Create a mock Calculation object
     mock_operation = Mock(spec=Calculation)
     mock_operation.compute.return_value = 15  # Set compute return value
-    
+
     # Create an instance of the Calculator
     calculator = Calculator()
 

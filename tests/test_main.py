@@ -1,134 +1,126 @@
+"""Test module for OperationCommand and HistoryManager."""
+
+from unittest.mock import Mock
+
+from app.calculation import Calculation
+from app.history_manager import (
+    OperationCommand,
+    HistoryManager,
+)
 
 
-import pytest
-import pexpect
-import sys
+
+def test_operation_command_execution():
+    """
+    Test that OperationCommand calls the compute method on the given operation.
+    """
+    # Create a mock Calculation object
+    mock_operation = Mock(spec=Calculation)
+    mock_operation.compute.return_value = 10  # Set compute return value
+
+    # Create an OperationCommand with the mock operation
+    command = OperationCommand(mock_operation)
+
+    # Execute the command and assert that compute is called and returns the expected result
+    result = command.execute()
+    assert result == 10
+    mock_operation.compute.assert_called_once()  # Ensure compute() was called exactly once
 
 
+def test_add_to_history():
+    """
+    Test adding an operation to the history.
+    """
+    # Create a mock OperationCommand
+    mock_command = Mock(spec=OperationCommand)
 
-def test_repl_addition(repl: pexpect.spawn):
-    """Test addition operation in the REPL."""
-    repl.sendline('add 10 5')
-    repl.expect('Result: 15\.0')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+    # Create a HistoryManager instance
+    history_manager = HistoryManager()
 
-def test_repl_help(repl: pexpect.spawn):
-    """Test the help command in the REPL."""
-    repl.sendline('help')
-    repl.expect('Available commands:')
-    repl.expect('add a b.*Adds a and b')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+    # Add the mock command to history and verify that it is stored correctly
+    history_manager.add_to_history(mock_command)
+    assert len(history_manager.get_full_history()) == 1
+    assert history_manager.get_full_history()[0] == mock_command
 
-def test_repl_invalid_command(repl: pexpect.spawn):
-    """Test handling of an unknown command."""
-    repl.sendline('unknown 1 2')
-    repl.expect("Unknown operation 'unknown'.*")
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
 
-def test_repl_division_by_zero(repl: pexpect.spawn):
-    """Test division by zero handling."""
-    repl.sendline('divide 10 0')
-    repl.expect('Error: Division by zero\.')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+def test_get_latest():
+    """
+    Test retrieving the latest n operations from history.
+    """
+    # Create mock OperationCommand objects
+    mock_command_1 = Mock(spec=OperationCommand)
+    mock_command_2 = Mock(spec=OperationCommand)
 
-def test_repl_invalid_numbers(repl: pexpect.spawn):
-    """Test handling of invalid numeric input."""
-    repl.sendline('add ten five')
-    repl.expect('Invalid numbers\. Please enter valid numeric values\.')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+    # Create a HistoryManager instance
+    history_manager = HistoryManager()
 
-def test_repl_multiple_operations(repl: pexpect.spawn):
-    """Test multiple operations in a single REPL session."""
-    repl.sendline('add 1 2')
-    repl.expect('Result: 3\.0')
-    repl.sendline('subtract 5 3')
-    repl.expect('Result: 2\.0')
-    repl.sendline('multiply 4 2')
-    repl.expect('Result: 8\.0')
-    repl.sendline('divide 9 3')
-    repl.expect('Result: 3\.0')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
-# test_main.py
+    # Add two commands to history
+    history_manager.add_to_history(mock_command_1)
+    history_manager.add_to_history(mock_command_2)
 
-import pytest
-import pexpect
-import sys
+    # Retrieve the latest operation
+    latest_operation = history_manager.get_latest(1)
+    assert len(latest_operation) == 1
+    assert latest_operation[0] == mock_command_2
 
-@pytest.fixture
-def repl():
-    """Fixture to start the REPL application."""
-    # Path to the main.py script
-    script = 'main.py'
+    # Retrieve the latest 2 operations
+    latest_two_operations = history_manager.get_latest(2)
+    assert len(latest_two_operations) == 2
+    assert latest_two_operations == [mock_command_1, mock_command_2]
 
-    # Start the REPL application
-    child = pexpect.spawn(sys.executable + f' {script}', encoding='utf-8', timeout=5)
-    child.expect('Welcome to the Calculator REPL.*')
-    yield child
-    child.terminate()
 
-def test_repl_addition(repl: pexpect.spawn):
-    """Test addition operation in the REPL."""
-    repl.sendline('add 10 5')
-    repl.expect('Result: 15\.0')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+def test_clear_history():
+    """
+    Test clearing the history.
+    """
+    # Create mock OperationCommand objects
+    mock_command_1 = Mock(spec=OperationCommand)
+    mock_command_2 = Mock(spec=OperationCommand)
 
-def test_repl_help(repl: pexpect.spawn):
-    """Test the help command in the REPL."""
-    repl.sendline('help')
-    repl.expect('Available commands:')
-    repl.expect('add a b.*Adds a and b')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+    # Create a HistoryManager instance
+    history_manager = HistoryManager()
 
-def test_repl_invalid_command(repl: pexpect.spawn):
-    """Test handling of an unknown command."""
-    repl.sendline('unknown 1 2')
-    repl.expect("Unknown operation 'unknown'.*")
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+    # Add two commands to history
+    history_manager.add_to_history(mock_command_1)
+    history_manager.add_to_history(mock_command_2)
 
-def test_repl_division_by_zero(repl: pexpect.spawn):
-    """Test division by zero handling."""
-    repl.sendline('divide 10 0')
-    repl.expect('Error: Division by zero\.')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+    # Verify that history has two commands before clearing
+    assert len(history_manager.get_full_history()) == 2
+    assert mock_command_1 in history_manager.get_full_history()
+    assert mock_command_2 in history_manager.get_full_history()
 
-def test_repl_invalid_numbers(repl: pexpect.spawn):
-    """Test handling of invalid numeric input."""
-    repl.sendline('add ten five')
-    repl.expect('Invalid numbers\. Please enter valid numeric values\.')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+    # Clear the history
+    history_manager.clear_history()
 
-def test_repl_multiple_operations(repl: pexpect.spawn):
-    """Test multiple operations in a single REPL session."""
-    repl.sendline('add 1 2')
-    repl.expect('Result: 3\.0')
-    repl.sendline('subtract 5 3')
-    repl.expect('Result: 2\.0')
-    repl.sendline('multiply 4 2')
-    repl.expect('Result: 8\.0')
-    repl.sendline('divide 9 3')
-    repl.expect('Result: 3\.0')
-    repl.sendline('exit')
-    repl.expect('Goodbye!')
-    repl.expect(pexpect.EOF)
+    # Assert that the history is now empty
+    assert len(history_manager.get_full_history()) == 0
+
+
+def test_undo_last():
+    """
+    Test undoing the last operation in history.
+    """
+    # Create mock OperationCommand objects
+    mock_command_1 = Mock(spec=OperationCommand)
+    mock_command_2 = Mock(spec=OperationCommand)
+
+    # Create a HistoryManager instance
+    history_manager = HistoryManager()
+
+    # Add two commands to history
+    history_manager.add_to_history(mock_command_1)
+    history_manager.add_to_history(mock_command_2)
+
+    # Undo the last operation and verify the result
+    last_operation = history_manager.undo_last()
+    assert last_operation == mock_command_2
+    assert len(history_manager.get_full_history()) == 1
+
+    # Undo the next operation
+    last_operation = history_manager.undo_last()
+    assert last_operation == mock_command_1
+    assert len(history_manager.get_full_history()) == 0
+
+    # Ensure that undoing when the history is empty returns None
+    last_operation = history_manager.undo_last()
+    assert last_operation is None

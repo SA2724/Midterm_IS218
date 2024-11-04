@@ -1,7 +1,14 @@
-import pytest
+"""Test module for OperationCommand and HistoryManager."""
+
 from unittest.mock import Mock
+
+
 from app.calculation import Calculation
-from app.history_manager import OperationCommand, HistoryManager  # Assuming HistoryManager is in 'history_manager'
+from app.history_manager import (
+    OperationCommand,
+    HistoryManager,
+)  # Assuming HistoryManager is in 'history_manager'
+
 
 # Test OperationCommand
 def test_operation_command_execution():
@@ -20,6 +27,7 @@ def test_operation_command_execution():
     assert result == 10
     mock_operation.compute.assert_called_once()  # Ensure compute() was called exactly once
 
+
 # Test HistoryManager
 def test_add_to_history():
     """
@@ -35,6 +43,7 @@ def test_add_to_history():
     history_manager.add_to_history(mock_command)
     assert len(history_manager.get_full_history()) == 1
     assert history_manager.get_full_history()[0] == mock_command
+
 
 def test_get_latest():
     """
@@ -61,6 +70,7 @@ def test_get_latest():
     assert len(latest_two_operations) == 2
     assert latest_two_operations == [mock_command_1, mock_command_2]
 
+
 def test_clear_history():
     """
     Test clearing the history.
@@ -76,11 +86,17 @@ def test_clear_history():
     history_manager.add_to_history(mock_command_1)
     history_manager.add_to_history(mock_command_2)
 
+    # Verify that history has two commands before clearing
+    assert len(history_manager.get_full_history()) == 2
+    assert mock_command_1 in history_manager.get_full_history()
+    assert mock_command_2 in history_manager.get_full_history()
+
     # Clear the history
     history_manager.clear_history()
 
     # Assert that the history is now empty
     assert len(history_manager.get_full_history()) == 0
+
 
 def test_undo_last():
     """
