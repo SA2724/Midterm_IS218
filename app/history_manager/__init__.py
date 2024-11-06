@@ -1,15 +1,21 @@
 from typing import List, Union
 
-from app.calculation import Calculation
-from app.operations import Number
 
 # Command pattern for executing operations
 class OperationCommand:
-    def __init__(self, operation: Calculation) -> None:
-        self.operation = operation
+    """
+    Represents a record of an operation performed, used for history tracking.
+    """
 
-    def execute(self) -> Number:
-        return self.operation.compute()
+    def __init__(self, operation: str, a: float, b: float, result: float) -> None:
+        self.operation = operation  # The operation performed (e.g., 'add')
+        self.a = a                  # The first operand
+        self.b = b                  # The second operand
+        self.result = result        # The result of the operation
+
+    def __str__(self) -> str:
+        return f"{self.operation} {self.a} {self.b} = {self.result}"
+
 
 class HistoryManager:
     """

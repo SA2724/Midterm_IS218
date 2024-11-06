@@ -90,6 +90,15 @@ class Addition(Calculation):
 
     def __repr__(self) -> str:
         return f"Addition(a={self.a}, b={self.b}, result={self.compute()})"
+    
+    @classmethod
+    def create(cls, a: Number, b: Number) -> 'Addition':
+        return cls(a, b)
+
+    @property
+    def operation(self) -> str:
+        return 'add'
+
 
 class Subtraction(Calculation):
     """
@@ -106,6 +115,14 @@ class Subtraction(Calculation):
 
     def __repr__(self) -> str:
         return f"Subtraction(a={self.a}, b={self.b}, result={self.compute()})"
+    
+    @classmethod
+    def create(cls, a: Number, b: Number) -> 'Subtraction':
+        return cls(a, b)
+
+    @property
+    def operation(self) -> str:
+        return 'subtract'
 
 class Multiplication(Calculation):
     """
@@ -122,6 +139,14 @@ class Multiplication(Calculation):
 
     def __repr__(self) -> str:
         return f"Multiplication(a={self.a}, b={self.b}, result={self.compute()})"
+    
+    @classmethod
+    def create(cls, a: Number, b: Number) -> 'Multiplication':
+        return cls(a, b)
+    
+    @property
+    def operation(self) -> str:
+        return 'multiply'
 
 class Division(Calculation):
     """
@@ -134,6 +159,20 @@ class Division(Calculation):
         if self.b == 0:
             raise ZeroDivisionError("Division by zero is not allowed")
         return division(self.a, self.b)
+    
+    @classmethod
+    def create(cls, a: Number, b: Number) -> 'Division':
+        """
+        Factory method to create a new Division instance.
+
+        Args:
+            a (Number): The dividend.
+            b (Number): The divisor.
+
+        Returns:
+            Division: A new instance of the Division class.
+        """
+        return cls(a, b)
 
     def __str__(self) -> str:
         result = self.compute()
@@ -145,6 +184,11 @@ class Division(Calculation):
         result = self.compute()
         formatted_result = int(result) if result.is_integer() else result
         return f"Division(a={self.a}, b={self.b}, result={formatted_result})"
+
+    @property
+    def operation(self) -> str:
+        return 'divide'
+
 class Power(Calculation):
     """
     Reprsents the power function 
@@ -154,17 +198,48 @@ class Power(Calculation):
     def compute(self) -> Number:
         return power(self.a, self.b)
 
+    @classmethod
+    def create(cls, a: Number, b: Number) -> 'Power':
+        """
+        Factory method to create a new Power instance.
+
+        Args:
+            a (Number): The base number.
+            b (Number): The exponent.
+
+        Returns:
+            Power: A new instance of the Power calculation.
+        """
+        return cls(a, b)
     def __str__(self) -> str:
         return f"Power: {self.a} ** {self.b} = {self.compute()}"
 
     def __repr__(self) -> str:
         return f"Power(a={self.a}, b={self.b}, result={self.compute()})"
+
+    @property
+    def operation(self) -> str:
+        return 'power'
+
 class Modulus(Calculation):
     """
     Represents a modulus operation.
     
-    Inherits from the Calculation base class and implements the `compute`, `__str__`, and `__repr__` methods.
+    Inherits from the Calculation base class and implements the `compute`, `__str__`, `__repr__` methods.
     """
+    @classmethod
+    def create(cls, a: Number, b: Number) -> 'Modulus':
+        """
+        Class method to create a new Modulus instance.
+
+        Args:
+            a (Number): The first operand.
+            b (Number): The second operand.
+
+        Returns:
+            Modulus: A new instance of Modulus with the given operands.
+        """
+        return cls(a, b)
     
     def compute(self) -> Number:
         """
@@ -197,3 +272,7 @@ class Modulus(Calculation):
             str: Detailed representation including operands and result.
         """
         return f"Modulus(a={self.a}, b={self.b}, result={self.compute()})"
+
+    @property
+    def operation(self) -> str:
+        return 'mod'

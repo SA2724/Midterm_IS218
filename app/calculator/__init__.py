@@ -5,52 +5,38 @@ from app.operations import Number
 
 
 class Calculator:
-    """
-    The Calculator class ties together operations and their history.
-    
-    This class allows performing operations, managing the operation history, and undoing actions.
-
-    Attributes:
-    history_manager (HistoryManager): Manages the history of operations.
-    """
-
-    def __init__(self) -> None:
-        """Initializes the Calculator with a history manager."""
+    def __init__(self):
         self.history_manager = HistoryManager()
 
-    def perform_operation(self, operation: 'Calculation') -> Number:
-        """
-        Perform the calculation and store it in history.
-
-        Args:
-        operation (Calculation): The calculation to perform.
-
-        Returns:
-        Number: The result of the calculation.
-        """
-        command = OperationCommand(operation)
-        result = command.execute()
-        self.history_manager.add_to_history(command)
+    def perform_operation(self, calculation):
+        result = calculation.compute()
+        # Assuming 'calculation' has 'operation', 'a', and 'b' attributes
+        operation_command = OperationCommand(
+            operation=calculation.operation,  # e.g., 'add', 'subtract'
+            a=calculation.a,
+            b=calculation.b,
+            result=result
+        )
+        self.history_manager.add_to_history(operation_command)
         return result
 
-    def get_history(self) -> List['OperationCommand']:
-        """
-        Get the full history of performed operations.
-
-        Returns:
-        List[OperationCommand]: The list of all performed operations.
-        """
+    def get_history(self):
         return self.history_manager.get_full_history()
 
-    def undo(self) -> Union['OperationCommand', None]:
-        """
-        Undo the last operation.
-
-        Returns:
-        Union[OperationCommand, None]: The last operation that was undone, or None if history is empty.
-        """
+    def undo(self):
         return self.history_manager.undo_last()
 
-    def clear_history(self) -> None:
-        """Clear the entire calculator history."""
+    def clear_history(self):
         self.history_manager.clear_history()
+    # In app/calculator/__init__.py or wherever your Calculator class is defined
+
+def perform_operation(self, calculation):
+    result = calculation.compute()
+    operation_command = OperationCommand(
+        operation=calculation.operation,  # e.g., 'add', 'subtract'
+        a=calculation.a,
+        b=calculation.b,
+        result=result
+    )
+    self.history_manager.add_to_history(operation_command)
+    return result

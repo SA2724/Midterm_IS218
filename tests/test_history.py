@@ -1,95 +1,99 @@
 """Test module for OperationCommand and HistoryManager."""
 
-from unittest.mock import Mock
 
 
-from app.calculation import Calculation
 from app.history_manager import (
     OperationCommand,
     HistoryManager,
 )  # Assuming HistoryManager is in 'history_manager'
 
-
-# Test OperationCommand
-def test_operation_command_execution():
+def test_operation_command_creation():
     """
-    Test that OperationCommand calls the compute method on the given operation.
+    Test that OperationCommand is created correctly with the given parameters.
     """
-    # Create a mock Calculation object
-    mock_operation = Mock(spec=Calculation)
-    mock_operation.compute.return_value = 10  # Set compute return value
+    # Define test data
+    operation = 'add'
+    a = 5.0
+    b = 10.0
+    result = 15.0
 
-    # Create an OperationCommand with the mock operation
-    command = OperationCommand(mock_operation)
+    # Create an OperationCommand instance
+    command = OperationCommand(operation, a, b, result)
 
-    # Execute the command and assert that compute is called and returns the expected result
-    result = command.execute()
-    assert result == 10
-    mock_operation.compute.assert_called_once()  # Ensure compute() was called exactly once
+    # Check that the attributes are set correctly
+    assert command.operation == operation
+    assert command.a == a
+    assert command.b == b
+    assert command.result == result
+
+    # Test the __str__ method
+    expected_str = f"{operation} {a} {b} = {result}"
+    assert str(command) == expected_str
 
 
-# Test HistoryManager
+
 def test_add_to_history():
     """
     Test adding an operation to the history.
     """
-    # Create a mock OperationCommand
-    mock_command = Mock(spec=OperationCommand)
+    # Create an OperationCommand instance
+    command = OperationCommand('add', 5.0, 10.0, 15.0)
 
     # Create a HistoryManager instance
     history_manager = HistoryManager()
 
-    # Add the mock command to history and verify that it is stored correctly
-    history_manager.add_to_history(mock_command)
+    # Add the command to history and verify that it is stored correctly
+    history_manager.add_to_history(command)
     assert len(history_manager.get_full_history()) == 1
-    assert history_manager.get_full_history()[0] == mock_command
+    assert history_manager.get_full_history()[0] == command
+
 
 
 def test_get_latest():
     """
     Test retrieving the latest n operations from history.
     """
-    # Create mock OperationCommand objects
-    mock_command_1 = Mock(spec=OperationCommand)
-    mock_command_2 = Mock(spec=OperationCommand)
+    # Create OperationCommand instances
+    command1 = OperationCommand('add', 5.0, 5.0, 10.0)
+    command2 = OperationCommand('multiply', 4.0, 5.0, 20.0)
 
     # Create a HistoryManager instance
     history_manager = HistoryManager()
 
     # Add two commands to history
-    history_manager.add_to_history(mock_command_1)
-    history_manager.add_to_history(mock_command_2)
+    history_manager.add_to_history(command1)
+    history_manager.add_to_history(command2)
 
     # Retrieve the latest operation
     latest_operation = history_manager.get_latest(1)
     assert len(latest_operation) == 1
-    assert latest_operation[0] == mock_command_2
+    assert latest_operation[0] == command2
 
     # Retrieve the latest 2 operations
     latest_two_operations = history_manager.get_latest(2)
     assert len(latest_two_operations) == 2
-    assert latest_two_operations == [mock_command_1, mock_command_2]
+    assert latest_two_operations == [command1, command2]
 
 
 def test_clear_history():
     """
     Test clearing the history.
     """
-    # Create mock OperationCommand objects
-    mock_command_1 = Mock(spec=OperationCommand)
-    mock_command_2 = Mock(spec=OperationCommand)
+    # Create OperationCommand instances
+    command1 = OperationCommand('add', 5.0, 5.0, 10.0)
+    command2 = OperationCommand('multiply', 4.0, 5.0, 20.0)
 
     # Create a HistoryManager instance
     history_manager = HistoryManager()
 
     # Add two commands to history
-    history_manager.add_to_history(mock_command_1)
-    history_manager.add_to_history(mock_command_2)
+    history_manager.add_to_history(command1)
+    history_manager.add_to_history(command2)
 
     # Verify that history has two commands before clearing
     assert len(history_manager.get_full_history()) == 2
-    assert mock_command_1 in history_manager.get_full_history()
-    assert mock_command_2 in history_manager.get_full_history()
+    assert command1 in history_manager.get_full_history()
+    assert command2 in history_manager.get_full_history()
 
     # Clear the history
     history_manager.clear_history()
@@ -98,29 +102,30 @@ def test_clear_history():
     assert len(history_manager.get_full_history()) == 0
 
 
+
 def test_undo_last():
     """
     Test undoing the last operation in history.
     """
-    # Create mock OperationCommand objects
-    mock_command_1 = Mock(spec=OperationCommand)
-    mock_command_2 = Mock(spec=OperationCommand)
+    # Create OperationCommand instances
+    command1 = OperationCommand('subtract', 15.0, 5.0, 10.0)
+    command2 = OperationCommand('multiply', 4.0, 5.0, 20.0)
 
     # Create a HistoryManager instance
     history_manager = HistoryManager()
 
     # Add two commands to history
-    history_manager.add_to_history(mock_command_1)
-    history_manager.add_to_history(mock_command_2)
+    history_manager.add_to_history(command1)
+    history_manager.add_to_history(command2)
 
     # Undo the last operation and verify the result
     last_operation = history_manager.undo_last()
-    assert last_operation == mock_command_2
+    assert last_operation == command2
     assert len(history_manager.get_full_history()) == 1
 
     # Undo the next operation
     last_operation = history_manager.undo_last()
-    assert last_operation == mock_command_1
+    assert last_operation == command1
     assert len(history_manager.get_full_history()) == 0
 
     # Ensure that undoing when the history is empty returns None
