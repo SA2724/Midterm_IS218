@@ -1,5 +1,6 @@
+# tests/test_calculation.py
 """
-Unit test for the Calculator's ability to perform opera
+Unit test for the Calculator's ability to perform operations
 """
 from unittest.mock import Mock
 
@@ -29,6 +30,10 @@ def test_perform_operation_add():
     history = calculator.get_history()
     assert len(history) == 1
     assert isinstance(history[0], OperationCommand)
+    assert history[0].operation == 'add'
+    assert history[0].a == 5
+    assert history[0].b == 10
+    assert history[0].result == 15
 
 def test_perform_operation_subtract():
     """
@@ -53,8 +58,12 @@ def test_perform_operation_subtract():
     history = calculator.get_history()
     assert len(history) == 1
     assert isinstance(history[0], OperationCommand)
+    assert history[0].operation == 'subtract'
+    assert history[0].a == 5
+    assert history[0].b == 10
+    assert history[0].result == -5
 
-def test_perform_operation_mulitply():
+def test_perform_operation_multiply():
     """
     Test that Calculator performs an operation and stores it in the history.
     """
@@ -77,3 +86,7 @@ def test_perform_operation_mulitply():
     history = calculator.get_history()
     assert len(history) == 1
     assert isinstance(history[0], OperationCommand)
+    assert history[0].operation == 'multiply'
+    assert history[0].a == 5
+    assert history[0].b == 10
+    assert history[0].result == 50
