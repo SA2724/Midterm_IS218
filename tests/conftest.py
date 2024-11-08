@@ -1,8 +1,10 @@
-"""Test fixtures for the Calculator application."""
+"""Configuration file for pytest fixtures."""
 
 import sys
+
 import pexpect
 import pytest
+from pyfakefs.fake_filesystem_unittest import Patcher
 
 from app.calculator import Calculator
 
@@ -11,6 +13,13 @@ from app.calculator import Calculator
 def calc():
     """Fixture to create a Calculator instance."""
     return Calculator()
+
+
+@pytest.fixture(autouse=True)
+def fake_fs():
+    """Automatically initialize pyfakefs for all tests."""
+    with Patcher() as patcher:
+        yield patcher.fs
 
 
 @pytest.fixture

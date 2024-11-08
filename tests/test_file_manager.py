@@ -4,17 +4,8 @@ import logging
 from typing import Any
 
 import pytest
-from pyfakefs.fake_filesystem_unittest import Patcher
 
 from app.file_manager import FileManager
-
-
-# Test Cases
-@pytest.fixture
-def fake_fs():
-    """Fixture to initialize pyfakefs."""
-    with Patcher() as patcher:
-        yield patcher.fs
 
 
 def test_write_file_positive(fake_fs: Any, caplog: pytest.LogCaptureFixture):
@@ -66,7 +57,7 @@ def test_delete_file_positive(fake_fs: Any, caplog: pytest.LogCaptureFixture):
     assert "Successfully deleted file: test_file.txt" in caplog.text
 
 
-def test_read_file_negative(fake_fs: Any, caplog: pytest.LogCaptureFixture):
+def test_read_file_negative(caplog: pytest.LogCaptureFixture):
     """Test reading from a non-existent file."""
     file_manager = FileManager("non_existent_file.txt")
 
@@ -78,7 +69,7 @@ def test_read_file_negative(fake_fs: Any, caplog: pytest.LogCaptureFixture):
     assert "File not found: non_existent_file.txt" in caplog.text
 
 
-def test_delete_file_negative(fake_fs: Any, caplog: pytest.LogCaptureFixture):
+def test_delete_file_negative(caplog: pytest.LogCaptureFixture):
     """Test deleting a non-existent file."""
     file_manager = FileManager("non_existent_file.txt")
 

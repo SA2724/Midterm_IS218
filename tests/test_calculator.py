@@ -1,7 +1,7 @@
 """Test module for Calculator operations and history management."""
 
 from app.calculator import Calculator
-from app.calculation import Addition, Division, Power, Subtraction, Multiplication, Modulus
+from app.calculation import Addition, Subtraction, Multiplication
 from app.history_manager import OperationCommand
 
 def test_perform_operation():
