@@ -28,6 +28,15 @@ class CommandProcessor:
         self.calculator = Calculator()
         self.history_manager = HistoryManager()
 
+    def undo_last(self):
+        """Undoes the last executed command, if any exist in history."""
+        last_command = self.history_manager.pop_last()
+        if last_command:
+            last_command.undo()
+            print("Last operation undone.")
+        else:
+            print("No commands to undo.")
+    
     def execute(self, command: str) -> None:
         """
         Executes a given command, processes the operation, records it in history, and displays the result.
@@ -104,18 +113,6 @@ Available commands:
         else:
             for index, command in enumerate(history, start=1):
                 print(f"{index}: {command.operation} {command.a} {command.b} = {command.result}")
-
-    def undo_last(self) -> None:
-        """Undoes the last operation and displays the undone operation."""
-        last_operation = self.history_manager.undo_last()
-        if last_operation:
-            # Implement the logic to undo the last operation using Calculator
-            # This depends on how Calculator is designed to handle undo operations
-            # For demonstration, we'll assume Calculator has an `undo_operation` method
-            self.calculator.undo_operation(last_operation)
-            print(f"Undid operation: {last_operation.operation} {last_operation.a} {last_operation.b} = {last_operation.result}")
-        else:
-            print("No operation to undo.")
 
     def clear_history(self) -> None:
         """Clears the operation history."""

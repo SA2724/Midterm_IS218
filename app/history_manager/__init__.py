@@ -16,6 +16,22 @@ class OperationCommand:
 
     def __str__(self) -> str:
         return f"{self.operation} {self.a} {self.b} = {self.result}"
+    
+    def undo_last(self):
+        """Undoes the last executed command, if any exist in history."""
+        last_command = self.history_manager.pop_last()
+        if last_command:
+            last_command.undo()
+        print("Last operation undone.")
+
+    def undo(self) -> None:
+        """
+        Undo the operation.
+
+        For a stateless calculator, undoing can simply involve notifying that the operation
+        has been removed from history. No state changes are required.
+        """
+        print(f"Undoing operation: {self}")
     def to_dict(self) -> dict:
         """Convert the command to a dictionary for easy CSV conversion."""
         return {
@@ -73,6 +89,14 @@ class HistoryManager:
             writer.writeheader()
             for command in self._history:
                 writer.writerow(command.to_dict())
+
+    def pop_last(self) -> Union[OperationCommand, None]:
+        """Remove and return the last operation from history."""
+        if self._history:
+            last_command = self._history.pop()
+            self.save_history()
+            return last_command
+        return None
 
     def load_history(self) -> None:
         """Load history from the CSV file if it exists."""

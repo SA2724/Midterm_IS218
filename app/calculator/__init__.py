@@ -23,7 +23,7 @@ class Calculator:
     def get_history(self):
         return self.history_manager.get_full_history()
 
-    def undo(self):
+    def undo_last_operation(self) -> Union[OperationCommand, None]:
         return self.history_manager.undo_last()
 
     def clear_history(self):
